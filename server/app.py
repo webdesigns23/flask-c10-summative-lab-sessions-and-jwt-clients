@@ -12,7 +12,7 @@ from models import User, CellarRecord, UserSchema, CellarRecordSchema
 def check_if_logged_in():
     open_access_list = ['signup', 'login']
     
-    if (request.endpoint) not in open_access_list and (not session.get('user-id')):
+    if request.endpoint not in open_access_list and not session.get('user_id'):
         return {'error': 'Unauthorized Access'}, 401
 
 # User Account
@@ -40,7 +40,7 @@ class CheckSession(Resource):
         if session.get('user_id'):
             user = User.query.filter(User.id == session['user_id']).first()
             return UserSchema().dump(user), 200
-        return {'error': 'User is not logged in'}, 401
+        return {'error': 'User is Not Logged In'}, 401
     
 class Login(Resource):
     def post(self):
@@ -53,28 +53,28 @@ class Login(Resource):
             session['user_id'] = user.id
             return UserSchema().dump(user), 200
 
-        return {'error': '401 Unauthorized'}, 401
+        return {'error': 'Unauthorized'}, 401
 
 class Logout(Resource):
     def delete(self):
         if session.get('user_id'):
             session['user_id'] = None
             return {}, 204
-        return {'error': 'User is already logged out'}, 401
+        return {'error': 'User is Already Logged Out'}, 401
     
-# CRUD
+# Create, Read
 class CellarRecordIndex(Resource):
     # GET /<resource> – paginated
     def get(self):
         if session.get('user_id'):
             cellar_records = [CellarRecordSchema().dump(cr) for cr in CellarRecord.query.all()]
             return cellar_records, 200    
-        return {'error': 'User is already logged out'}, 401  
+        return {'error': 'User is Logged Out'}, 401  
 	
 	# POST /<resource>
     def post(self):
         if not session.get('user_id'):
-                return {'error': 'User is already logged out'}, 401
+            return {'error': 'User is Logged Out'}, 401
 
         data = request.get_json()
 
@@ -92,27 +92,47 @@ class CellarRecordIndex(Resource):
             db.session.commit()
             return CellarRecordSchema().dump(cellar_record), 201
 
-        except ValueError as error:
+        except ValueError:
             db.session.rollback()  
-            return {'error': str(error)}, 422
+            return {'error': 'Unable to Process, Incorrect Value'}, 422
 
         except IntegrityError:
             db.session.rollback()
-            return {'error': 'Unable to process, invalid data'}, 422     
-    
-	# PATCH /<resource>/<id>
+            return {'error': 'Unable to Process, Data Invalid'}, 422     
+
+# Update, Delete by Id
+class CellarRecordId(Resource):
+    # PATCH /<resource>/<id>
     def patch(self, id):
         if not session.get('user_id'):
-                return {'error': 'User is already logged out'}, 401
-
+            return {'error': 'User is Logged Out'}, 401
         data = request.get_json()
+        cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
+        
+        if not cellar_record or cellar_record.user_id != session['user_id']:
+            return {'error': 'Forbidden, Unable to Update'}, 403
+        
+		# Update values
+        if 'quantity' in data:
+            cellar_record.quantity = data['quantity']
+        if 'tasting_notes' in data:
+            cellar_record.tasting_notes = data['tasting_notes']
+            
+        db.session.commit()
+        return CellarRecordSchema().dump(cellar_record), 200
 	
 	# DELETE /<resource>/<id>
     def delete(self, id):
         if not session.get('user_id'):
-                return {'error': 'User is already logged out'}, 401
-
-        data = request.get_json()
+            return {'error': 'User is Logged Out'}, 401
+        cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
+        
+        if not cellar_record or cellar_record.user_id != session['user_id']:
+            return {'error': 'Forbidden, Unable to Delete'}, 403
+        else:
+            db.session.delete(cellar_record)
+            db.session.commit()
+            return {}, 204
 	
       
 
@@ -121,7 +141,7 @@ api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(CellarRecordIndex, '/cellar_records', endpoint='cellar_records')
-api.add_resource(CellarRecordIndex, '/cellar_record/<int:id>')
+api.add_resource(CellarRecordId, '/cellar_record/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
