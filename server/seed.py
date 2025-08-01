@@ -89,7 +89,25 @@ with app.app_context():
 		quantity = 12,
 		tasting_notes = "Medium Body, Dry, Acidic, Peach, Citrus, Minerals")
 	
-	db.session.add_all([cr1, cr2, cr3, cr4, cr5, cr6])
+	cr7 = CellarRecord(
+		user_id = u4.id,
+		wine = "Azelia",
+		grape = "Nebbiolo Langhe",
+		country = "Italy",
+		vintage = 2022,
+		quantity = 5,
+		tasting_notes = "Full Body, Dry, Tannic, Blackberry, Tabacco, Earthy")
+	
+	cr8 = CellarRecord(
+		user_id = u4.id,
+		wine = "Terres Dorees",
+		grape = "Chardonnay Beaujolais",
+		country = "France",
+		vintage = 2013,
+		quantity = 3,
+		tasting_notes = "Medium Body, Dry, Acidic, Peach, Citrus, Minerals")
+	
+	db.session.add_all([cr1, cr2, cr3, cr4, cr5, cr6, cr7, cr8])
 	db.session.commit()
 
 
