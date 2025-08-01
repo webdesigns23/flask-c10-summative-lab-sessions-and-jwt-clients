@@ -7,11 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from config import app, db, api
 from models import User, CellarRecord, UserSchema, CellarRecordSchema
 
-# GET /<resource> – paginated
-# POST /<resource>
-# PATCH /<resource>/<id>
-# DELETE /<resource>/<id>
-
+# User Account
 class Signup(Resource):
     def post(self):
         data = request.get_json()
@@ -37,9 +33,37 @@ class CheckSession(Resource):
             user = User.query.filter(User.id == session['user_id']).first()
             return UserSchema().dump(user), 200
         return {'error': 'User is not logged in'}, 401
+    
+class Login(Resource):
+    def post(self):
+        username = request.get_json()['username']
+        password = request.get_json()['password']
+
+        user = User.query.filter(User.username == username).first()
+
+        if user and user.authenticate(password):
+            session['user_id'] = user.id
+            return UserSchema().dump(user), 200
+
+        return {'error': '401 Unauthorized'}, 401
+
+class Logout(Resource):
+    def delete(self):
+        if session.get('user_id'):
+            session['user_id'] = None
+            return {}, 204
+        return {'error': 'User is already logged out'}, 401
+    
+# CRUD
+# GET /<resource> – paginated
+# POST /<resource>
+# PATCH /<resource>/<id>
+# DELETE /<resource>/<id>
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(Logout, '/logout', endpoint='logout')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
