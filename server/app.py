@@ -55,15 +55,52 @@ class Logout(Resource):
         return {'error': 'User is already logged out'}, 401
     
 # CRUD
-# GET /<resource> – paginated
-# POST /<resource>
-# PATCH /<resource>/<id>
-# DELETE /<resource>/<id>
+class CellarRecordIndex(Resource):
+    # GET /<resource> – paginated
+    def get(self):
+        if session.get('user_id'):
+            cellar_records = [CellarRecordSchema().dump(cr) for cr in CellarRecord.query.all()]
+            return cellar_records, 200    
+        return {'error': 'User is already logged out'}, 401  
+	
+	# POST /<resource>
+    def post(self):
+        if not session.get('user_id'):
+                return {'error': 'User is already logged out'}, 401
+
+        data = request.get_json()
+
+        try:
+            cellar_record = CellarRecord(
+                wine = data.get('wine'),
+				grape = data.get('grape'),
+				country = data.get('country'),
+				vintage = data.get('vintage'),
+				quantity = data.get('quantity'),
+				tasting_notes = data.get('tasting_notes'),
+                user_id=session['user_id']
+            )
+            db.session.add(cellar_record)
+            db.session.commit()
+            return CellarRecordSchema().dump(cellar_record), 201
+
+        except ValueError as error:
+            db.session.rollback()  
+            return {'error': str(error)}, 422
+
+        except IntegrityError:
+            db.session.rollback()
+            return {'error': 'Unable to process, invalid data'}, 422     
+    
+	# PATCH /<resource>/<id>
+	
+	# DELETE /<resource>/<id>    
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(CellarRecordIndex, '/cellar_records', endpoint='cellar_records')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
