@@ -6,7 +6,7 @@ from config import db, bcrypt
 
 # Model for wine cellar app users
 class User(db.Model):
-	__tablename__ = "users"
+	__tablename__ = 'users'
 
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String, unique=True, nullable=False)
@@ -34,7 +34,7 @@ class User(db.Model):
 
 # Model stores wine entries for users
 class CellarRecord(db.Model):
-	__tablename__ = "cellar_records"
+	__tablename__ = 'cellar_records'
 
 	id = db.Column(db.Integer, primary_key=True)
 	wine = db.Column(db.String, nullable=False)
@@ -50,13 +50,13 @@ class CellarRecord(db.Model):
 	@validates('quantity')
 	def validate_quantity(self, key, quantity):
 		if quantity < 0:
-			raise ValueError("Quantity cannot be a negative amount.")
+			raise ValueError('Quantity cannot be a negative amount.')
 		return quantity
 
 	@validates('tasting_notes')
 	def validate_tasting_notes(self, key, tasting_notes):
 		if tasting_notes and len(tasting_notes) > 65:
-			raise ValueError("Tasting notes cannot be longer than 65 characters.")
+			raise ValueError('Tasting notes cannot be longer than 65 characters.')
 		return tasting_notes
 
 	def __repr__(self):
@@ -67,7 +67,7 @@ class UserSchema(Schema):
 	username = fields.String()
 	image_url = fields.String()
 
-	cellar_records = fields.List(fields.Nested(lambda: CellarRecordSchema(exclude=("user",))))
+	cellar_records = fields.List(fields.Nested(lambda: CellarRecordSchema(exclude=('user',))))
 
 class CellarRecordSchema(Schema):
 	id = fields.Integer()
@@ -78,4 +78,4 @@ class CellarRecordSchema(Schema):
 	quantity = fields.Integer()
 	tasting_notes = fields.String()
 
-	user = fields.Nested(UserSchema(exclude=("cellar_records",)))
+	user = fields.Nested(UserSchema(exclude=('cellar_records',)))

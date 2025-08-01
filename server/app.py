@@ -12,5 +12,11 @@ from models import User, CellarRecord, UserSchema, CellarRecordSchema
 # PATCH /<resource>/<id>
 # DELETE /<resource>/<id>
 
+class Signup(Resource):
+    def post(self):
+        data = request.get_json()
+        
+        username = data.get('username')
+
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
