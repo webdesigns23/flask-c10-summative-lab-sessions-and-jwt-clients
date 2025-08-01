@@ -1,5 +1,7 @@
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
+from marshmallow import Schema, fields
+
 from config import db, bcrypt
 
 # Model for wine cellar app users
@@ -58,4 +60,22 @@ class CellarRecord(db.Model):
 		return tasting_notes
 
 	def __repr__(self):
-		return f'<Cellar Record: {self.wine}, {self.producer}, {self.country}, {self.vintage}, {self.quantity}, {self.tasting_notes}>'
+		return f'<Cellar Record: {self.wine}, {self.grape}, {self.country}, {self.vintage}, {self.quantity}, {self.tasting_notes}>'
+
+class UserSchema(Schema):
+	id = fields.Integer()
+	username = fields.String()
+	image_url = fields.String()
+
+	cellar_records = fields.List(fields.Nested(lambda: CellarRecordSchema(exclude=("user",))))
+
+class CellarRecordSchema(Schema):
+	id = fields.Integer()
+	wine = fields.String()
+	grape = fields.String()
+	country = fields.String()
+	vintage = fields.Integer()
+	quantity = fields.Integer()
+	tasting_notes = fields.String()
+
+	user = fields.Nested(UserSchema(exclude=("cellar_records",)))
