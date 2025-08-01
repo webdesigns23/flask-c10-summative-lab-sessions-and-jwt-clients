@@ -7,6 +7,14 @@ from sqlalchemy.exc import IntegrityError
 from config import app, db, api
 from models import User, CellarRecord, UserSchema, CellarRecordSchema
 
+# Protected Routes
+@app.before_request
+def check_if_logged_in():
+    open_access_list = ['signup', 'login']
+    
+    if (request.endpoint) not in open_access_list and (not session.get('user-id')):
+        return {'error': 'Unauthorized Access'}, 401
+
 # User Account
 class Signup(Resource):
     def post(self):
@@ -93,14 +101,27 @@ class CellarRecordIndex(Resource):
             return {'error': 'Unable to process, invalid data'}, 422     
     
 	# PATCH /<resource>/<id>
+    def patch(self, id):
+        if not session.get('user_id'):
+                return {'error': 'User is already logged out'}, 401
+
+        data = request.get_json()
 	
-	# DELETE /<resource>/<id>    
+	# DELETE /<resource>/<id>
+    def delete(self, id):
+        if not session.get('user_id'):
+                return {'error': 'User is already logged out'}, 401
+
+        data = request.get_json()
+	
+      
 
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(CellarRecordIndex, '/cellar_records', endpoint='cellar_records')
+api.add_resource(CellarRecordIndex, '/cellar_record/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
