@@ -12,7 +12,7 @@ from models import User, CellarRecord, UserSchema, CellarRecordSchema
 def check_if_logged_in():
     open_access_list = ['signup', 'check_session','login']
     
-    if request.endpoint not in open_access_list and not session.get('user_id'):
+    if (request.endpoint) not in open_access_list and (not session.get('user_id')):
         return {'error': 'Unauthorized Access'}, 401
 
 # User Account
@@ -68,8 +68,8 @@ class Logout(Resource):
 class CellarRecordIndex(Resource):
     # GET /<resource> – paginated
     def get(self):
-        if not session.get('user_id'):
-            return {'error': 'User is Logged Out'}, 401
+        # if not session.get('user_id'):
+        #     return {'error': 'User is Logged Out'}, 401
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 5, type=int)
         pagination = CellarRecord.query.paginate(page=page, per_page=per_page, error_out=False)
@@ -84,8 +84,8 @@ class CellarRecordIndex(Resource):
 	
 	# POST /<resource>
     def post(self):
-        if not session.get('user_id'):
-            return {'error': 'User is Logged Out'}, 401
+        # if not session.get('user_id'):
+        #     return {'error': 'User is Logged Out'}, 401
 
         data = request.get_json()
 
@@ -115,8 +115,8 @@ class CellarRecordIndex(Resource):
 class CellarRecordId(Resource):
     # PATCH /<resource>/<id>
     def patch(self, id):
-        if not session.get('user_id'):
-            return {'error': 'User is Logged Out'}, 401
+        # if not session.get('user_id'):
+        #     return {'error': 'User is Logged Out'}, 401
         
         data = request.get_json()
         cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
@@ -141,8 +141,8 @@ class CellarRecordId(Resource):
 	
 	# DELETE /<resource>/<id>
     def delete(self, id):
-        if not session.get('user_id'):
-            return {'error': 'User is Logged Out'}, 401
+        # if not session.get('user_id'):
+        #     return {'error': 'User is Logged Out'}, 401
         
         cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
         

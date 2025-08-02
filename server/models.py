@@ -53,12 +53,20 @@ class CellarRecord(db.Model):
 
 	@validates('vintage')
 	def validate_vintage(self, key, vintage):
+		if vintage is None:
+			raise ValueError("Vintage must be provided.")
+		if not isinstance(vintage, int):
+			raise ValueError("Vitage must be an integer - YYYY.")
 		if vintage < 1800 or vintage > 2026:
-			raise ValueError('Vintage year needs to be a valid year between 1800 and current date, YYYY')
+			raise ValueError('Vintage year needs to be a valid year between 1800 and current date.')
 		return vintage 
 
 	@validates('quantity')
 	def validate_quantity(self, key, quantity):
+		if quantity is None:
+			raise ValueError("Quantity must be provided")
+		if not isinstance(quantity, int):
+			raise ValueError("Quantity must be an integer.")
 		if quantity < 0:
 			raise ValueError('Quantity cannot be a negative amount.')
 		return quantity
