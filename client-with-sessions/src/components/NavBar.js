@@ -15,7 +15,7 @@ function NavBar({ user, setUser }) {
   return (
     <Wrapper>
       <Logo>
-        <Link to="/">My App</Link>
+        <Link to="/">My Wine Cellar</Link>
       </Logo>
       <Nav>
         <Button>
@@ -39,7 +39,7 @@ const Wrapper = styled.header`
 const Logo = styled.h1`
   font-family: "Permanent Marker", cursive;
   font-size: 3rem;
-  color: deeppink;
+  color: maroon;
   margin: 0;
   line-height: 1;
 
