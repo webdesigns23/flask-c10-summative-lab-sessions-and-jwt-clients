@@ -66,10 +66,7 @@ class Logout(Resource):
     
 # Create, Read, Add Pagination
 class CellarRecordIndex(Resource):
-    # GET /<resource> – paginated
     def get(self):
-        # if not session.get('user_id'):
-        #     return {'error': 'User is Logged Out'}, 401
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 5, type=int)
         pagination = CellarRecord.query.paginate(page=page, per_page=per_page, error_out=False)
@@ -82,11 +79,7 @@ class CellarRecordIndex(Resource):
             'items': [CellarRecordSchema().dump(cr) for cr in cellar_records]
 		}, 200
 	
-	# POST /<resource>
     def post(self):
-        # if not session.get('user_id'):
-        #     return {'error': 'User is Logged Out'}, 401
-
         data = request.get_json()
 
         try:
@@ -113,11 +106,7 @@ class CellarRecordIndex(Resource):
 
 # Update, Delete by Id
 class CellarRecordId(Resource):
-    # PATCH /<resource>/<id>
     def patch(self, id):
-        # if not session.get('user_id'):
-        #     return {'error': 'User is Logged Out'}, 401
-        
         data = request.get_json()
         cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
         
@@ -139,11 +128,7 @@ class CellarRecordId(Resource):
         db.session.commit()
         return CellarRecordSchema().dump(cellar_record), 200
 	
-	# DELETE /<resource>/<id>
     def delete(self, id):
-        # if not session.get('user_id'):
-        #     return {'error': 'User is Logged Out'}, 401
-        
         cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
         
         if not cellar_record or cellar_record.user_id != session['user_id']:
@@ -152,9 +137,8 @@ class CellarRecordId(Resource):
             db.session.delete(cellar_record)
             db.session.commit()
             return {}, 204
-	
-      
-
+          
+# API Endpoints
 api.add_resource(Signup, '/signup', endpoint='signup')
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 api.add_resource(Login, '/login', endpoint='login')
