@@ -5,6 +5,7 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 import os
+from flask_cors import CORS
 
 secret_key = os.urandom(24)
 
@@ -13,6 +14,9 @@ app.secret_key = secret_key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
+
+# So front can talk to back and session-based works with React
+CORS(app, supports_credentials=True, origins=['http://localhost:4000'])
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
