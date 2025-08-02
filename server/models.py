@@ -51,6 +51,12 @@ class CellarRecord(db.Model):
 	user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
 	user = db.relationship('User', back_populates='cellar_records')
 
+	@validates('vintage')
+	def validate_vintage(self, key, vintage):
+		if vintage < 1800 or vintage > 2026:
+			raise ValueError('Vintage year needs to be a valid year between 1800 and current date, YYYY')
+		return vintage 
+
 	@validates('quantity')
 	def validate_quantity(self, key, quantity):
 		if quantity < 0:
@@ -82,4 +88,4 @@ class CellarRecordSchema(Schema):
 	quantity = fields.Integer()
 	tasting_notes = fields.String()
 
-	user = fields.Nested(UserSchema(exclude=('cellar_records',)))
+	user = fields.Nested(lambda: UserSchema(exclude=('cellar_records',)))

@@ -47,7 +47,7 @@ class Login(Resource):
         data = request.get_json()
 
         username = data.get('username').strip().lower()
-        password = password = data.get('password')
+        password = data.get('password')
 
         user = User.query.filter(User.username == username).first()
 
@@ -126,9 +126,15 @@ class CellarRecordId(Resource):
         
 		# Update values
         if 'quantity' in data:
-            cellar_record.quantity = data['quantity']
+            try:
+                cellar_record.quantity = int(data['quantity'])
+            except ValueError:
+                return {'error': 'Invalid quantity value'}, 422
         if 'tasting_notes' in data:
-            cellar_record.tasting_notes = data['tasting_notes']
+            try:
+                cellar_record.tasting_notes = str(data['tasting_notes'])
+            except ValueError:
+                return {'error': 'Invalid tasting notes data'}, 422
             
         db.session.commit()
         return CellarRecordSchema().dump(cellar_record), 200
