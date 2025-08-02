@@ -14,19 +14,19 @@ with app.app_context():
 
 	# Create users, unique username, pw hashed before stored!
 	print('Creating Users...')
-	u1 = User(username = 'Luna', 
+	u1 = User(username = 'luna', 
 		   image_url = 'https://images.pexels.com/photos/1461622/pexels-photo-1461622.jpeg') 
 	u1.password_hash = 'kitten123'
 
-	u2 = User(username = 'Pew',
+	u2 = User(username = 'pew',
 		   image_url = 'https://images.pexels.com/photos/30946039/pexels-photo-30946039/free-photo-of-close-up-portrait-of-a-long-haired-gray-cat.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500')
 	u2.password_hash = 'cat456'
 	
-	u3 = User(username = 'Grumpkins',
+	u3 = User(username = 'grumpkins',
 		   image_url = 'https://images.pexels.com/photos/17685041/pexels-photo-17685041.jpeg?cs=srgb&dl=pexels-pet-foto-644780685-17685041.jpg&fm=jpg')
 	u3.password_hash = 'grumpy789'
 	
-	u4 = User(username = 'Bear',
+	u4 = User(username = 'bear',
 		   image_url = 'https://images.pexels.com/photos/34700/bear-animals-zoo-captivity.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500')
 	u4.password_hash = 'pw102030'
 

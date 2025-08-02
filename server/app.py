@@ -46,7 +46,7 @@ class Login(Resource):
     def post(self):
         data = request.get_json()
 
-        username = data.get('username', '').strip().lower()
+        username = data.get('username').strip().lower()
         password = password = data.get('password')
 
         user = User.query.filter(User.username == username).first()
