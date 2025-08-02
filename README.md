@@ -1,13 +1,6 @@
-
-Installation instructions (i.e. pipenv install, migrating and seeding the database, etc)
-Run instructions (i.e. flask run or python app.py)
-List with descriptions of all endpoints the API has
-
 Wine Journal Summative Lab
 =======
-
-# Description:
-A wine journal app for keeping records of your wine cellar.
+A wine journal app for keeping records of current wines in your cellar.
 
 # Features:
 1. Users are able to create an account to personally manage their wine collection.
