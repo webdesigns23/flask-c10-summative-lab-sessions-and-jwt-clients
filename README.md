@@ -7,7 +7,9 @@ A wine journal app for keeping records of current wines in your cellar.
 	- User can Sign up by creating a username, password, and providing an image_url
 	- Users are able to Login/Logout
 	- Session cookies are used to remember login
+
 2. Once logged in, they are able to view, update, create, or delete their wine bottles logged in their Cellar Records. 
+
 3. Users are able to store the following information about their wines in their Cellar Record:
 	- Wine (Name of the Wine)
 	- Grape (Name of the Grape)
