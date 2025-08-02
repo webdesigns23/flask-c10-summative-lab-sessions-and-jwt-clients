@@ -15,6 +15,10 @@ class User(db.Model):
 
 	cellar_records = db.relationship('CellarRecord', back_populates='user')
 
+	@validates('username')
+	def nomalize_username(self, key, value):
+		return value.strip().lower()
+
 	@hybrid_property
 	def password_hash(self):
 		raise AttributeError('Password hashes may not be viewed')

@@ -20,11 +20,11 @@ class Signup(Resource):
     def post(self):
         data = request.get_json()
         
-        username = data.get('username')
+        username = data.get('username', '').strip().lower()
         password = data.get('password')
         image_url = data.get('image_url')
         
-        user = User(username = username, image_url = image_url)
+        user = User(username=username, image_url=image_url)
         user.password_hash = password
         
         try:
@@ -44,8 +44,10 @@ class CheckSession(Resource):
     
 class Login(Resource):
     def post(self):
-        username = request.get_json()['username']
-        password = request.get_json()['password']
+        data = request.get_json()
+
+        username = data.get('username', '').strip().lower()
+        password = password = data.get('password')
 
         user = User.query.filter(User.username == username).first()
 
