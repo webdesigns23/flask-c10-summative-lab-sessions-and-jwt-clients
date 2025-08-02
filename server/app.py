@@ -10,7 +10,7 @@ from models import User, CellarRecord, UserSchema, CellarRecordSchema
 # Protected Routes
 @app.before_request
 def check_if_logged_in():
-    open_access_list = ['signup', 'login']
+    open_access_list = ['signup', 'check_session','login']
     
     if request.endpoint not in open_access_list and not session.get('user_id'):
         return {'error': 'Unauthorized Access'}, 401
@@ -62,14 +62,23 @@ class Logout(Resource):
             return {}, 204
         return {'error': 'User is Already Logged Out'}, 401
     
-# Create, Read
+# Create, Read, Add Pagination
 class CellarRecordIndex(Resource):
     # GET /<resource> – paginated
     def get(self):
-        if session.get('user_id'):
-            cellar_records = [CellarRecordSchema().dump(cr) for cr in CellarRecord.query.all()]
-            return cellar_records, 200    
-        return {'error': 'User is Logged Out'}, 401  
+        if not session.get('user_id'):
+            return {'error': 'User is Logged Out'}, 401
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 5, type=int)
+        pagination = CellarRecord.query.paginate(page=page, per_page=per_page, error_out=False)
+        cellar_records = pagination.items
+        return {
+            'page': page,
+            'per_page': per_page,
+            'total': pagination.total,
+            'total_pages': pagination.pages,
+            'items': [CellarRecordSchema().dump(cr) for cr in cellar_records]
+		}, 200
 	
 	# POST /<resource>
     def post(self):
@@ -106,6 +115,7 @@ class CellarRecordId(Resource):
     def patch(self, id):
         if not session.get('user_id'):
             return {'error': 'User is Logged Out'}, 401
+        
         data = request.get_json()
         cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
         
@@ -125,6 +135,7 @@ class CellarRecordId(Resource):
     def delete(self, id):
         if not session.get('user_id'):
             return {'error': 'User is Logged Out'}, 401
+        
         cellar_record = CellarRecord.query.filter(CellarRecord.id == id).first()
         
         if not cellar_record or cellar_record.user_id != session['user_id']:
